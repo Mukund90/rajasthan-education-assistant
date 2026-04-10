@@ -14,7 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_queries: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          query: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          query: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          query?: string
+        }
+        Relationships: []
+      }
+      colleges: {
+        Row: {
+          affiliation: string | null
+          branches: Json
+          city: string
+          code: string
+          contact: Json
+          created_at: string
+          cutoffs: Json
+          district: string
+          established: number | null
+          fees: Json
+          hostel: Json
+          id: string
+          image_url: string | null
+          name: string
+          placements: Json
+          type: string
+          website: string | null
+        }
+        Insert: {
+          affiliation?: string | null
+          branches?: Json
+          city: string
+          code: string
+          contact?: Json
+          created_at?: string
+          cutoffs?: Json
+          district: string
+          established?: number | null
+          fees?: Json
+          hostel?: Json
+          id?: string
+          image_url?: string | null
+          name: string
+          placements?: Json
+          type: string
+          website?: string | null
+        }
+        Update: {
+          affiliation?: string | null
+          branches?: Json
+          city?: string
+          code?: string
+          contact?: Json
+          created_at?: string
+          cutoffs?: Json
+          district?: string
+          established?: number | null
+          fees?: Json
+          hostel?: Json
+          id?: string
+          image_url?: string | null
+          name?: string
+          placements?: Json
+          type?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      scholarships: {
+        Row: {
+          amount: string | null
+          category: string | null
+          created_at: string
+          deadline: string | null
+          description: string | null
+          eligibility: string | null
+          how_to_apply: string | null
+          id: string
+          name: string
+          website: string | null
+        }
+        Insert: {
+          amount?: string | null
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          eligibility?: string | null
+          how_to_apply?: string | null
+          id?: string
+          name: string
+          website?: string | null
+        }
+        Update: {
+          amount?: string | null
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          eligibility?: string | null
+          how_to_apply?: string | null
+          id?: string
+          name?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
