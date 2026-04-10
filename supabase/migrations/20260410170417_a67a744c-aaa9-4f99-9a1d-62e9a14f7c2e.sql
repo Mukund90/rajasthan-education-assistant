@@ -1,0 +1,1 @@
+ALTER TABLE public.chat_queries ADD CONSTRAINT chat_queries_query_length CHECK (char_length(query) <= 1000);
