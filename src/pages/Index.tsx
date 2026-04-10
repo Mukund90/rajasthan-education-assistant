@@ -1,16 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { NavCategory } from "@/lib/types";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { ChatInterface } from "@/components/chat/ChatInterface";
+import { CollegeList } from "@/components/colleges/CollegeList";
+import { CollegeRecommender } from "@/components/colleges/CollegeRecommender";
+import { ScholarshipList } from "@/components/scholarships/ScholarshipList";
+import { AdmissionsInfo } from "@/components/admissions/AdmissionsInfo";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [activeTab, setActiveTab] = useState<NavCategory>("chat");
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "chat":
+        return <ChatInterface />;
+      case "colleges":
+        return <CollegeList />;
+      case "admissions":
+        return <AdmissionsInfo />;
+      case "scholarships":
+        return <ScholarshipList />;
+      case "recommend":
+        return <CollegeRecommender />;
+      default:
+        return <ChatInterface />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <AppLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      {renderContent()}
+    </AppLayout>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
