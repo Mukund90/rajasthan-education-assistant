@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { NavCategory, NAV_CATEGORIES } from "@/lib/types";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import {
   MessageSquare,
   GraduationCap,
@@ -9,6 +11,9 @@ import {
   Menu,
   X,
   Bot,
+  Shield,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 
 const ICONS: Record<string, React.ElementType> = {
@@ -27,6 +32,8 @@ interface AppLayoutProps {
 
 export function AppLayout({ activeTab, onTabChange, children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -87,8 +94,34 @@ export function AppLayout({ activeTab, onTabChange, children }: AppLayoutProps) 
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-sidebar-border">
-          <p className="text-xs text-sidebar-foreground/50 leading-relaxed">
+        <div className="p-3 space-y-1 border-t border-sidebar-border">
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Admin Panel</span>
+            </button>
+          )}
+          {user ? (
+            <button
+              onClick={async () => { await signOut(); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/admin/login")}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Admin Login</span>
+            </button>
+          )}
+          <p className="text-xs text-sidebar-foreground/50 leading-relaxed px-3 pt-2">
             Department of Technical Education
             <br />
             Government of Rajasthan
