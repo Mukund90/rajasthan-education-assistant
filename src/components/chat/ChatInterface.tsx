@@ -1,17 +1,21 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChatMessage, QUICK_QUESTIONS } from "@/lib/types";
 import { streamChat, logQuery } from "@/lib/chat-service";
-import { Send, Bot, User, Sparkles } from "lucide-react";
+import { Send, Bot, Sparkles, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TypingIndicator } from "./TypingIndicator";
 import { ChatBubble } from "./ChatBubble";
+import { useToast } from "@/hooks/use-toast";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,6 +24,53 @@ export function ChatInterface() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Setup speech recognition
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-IN";
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((r: any) => r[0].transcript)
+          .join("");
+        setInput(transcript);
+      };
+
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = (e: any) => {
+        setIsListening(false);
+        if (e.error !== "aborted") {
+          toast({ title: "Voice Error", description: `Could not recognize speech: ${e.error}`, variant: "destructive" });
+        }
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      recognitionRef.current?.abort();
+    };
+  }, [toast]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      toast({ title: "Not Supported", description: "Voice input is not supported in this browser.", variant: "destructive" });
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -105,12 +156,21 @@ export function ChatInterface() {
       {/* Input area */}
       <div className="border-t border-border bg-card p-4">
         <div className="max-w-3xl mx-auto flex gap-2">
+          <Button
+            onClick={toggleListening}
+            variant={isListening ? "destructive" : "outline"}
+            size="icon"
+            className="h-12 w-12 shrink-0"
+            title={isListening ? "Stop listening" : "Voice input"}
+          >
+            {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+          </Button>
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about admissions, colleges, scholarships..."
+            placeholder={isListening ? "Listening..." : "Ask about admissions, colleges, scholarships..."}
             className="flex-1 resize-none rounded-lg border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[48px] max-h-[120px]"
             rows={1}
             disabled={isLoading}
