@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import CollegeDetail from "./pages/CollegeDetail.tsx";
+import StudentLogin from "./pages/StudentLogin.tsx";
 
 const queryClient = new QueryClient();
 
