@@ -14,6 +14,8 @@ import {
   Shield,
   LogIn,
   LogOut,
+  Target,
+  Mail,
 } from "lucide-react";
 
 const ICONS: Record<string, React.ElementType> = {
@@ -22,6 +24,8 @@ const ICONS: Record<string, React.ElementType> = {
   ClipboardList,
   Award,
   Search,
+  Target,
+  Mail,
 };
 
 interface AppLayoutProps {
