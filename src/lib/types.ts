@@ -72,6 +72,8 @@ export const NAV_CATEGORIES = [
   { id: "admissions", label: "Admissions", icon: "ClipboardList" },
   { id: "scholarships", label: "Scholarships", icon: "Award" },
   { id: "recommend", label: "Find College", icon: "Search" },
+  { id: "predictor", label: "Predictor", icon: "Target" },
+  { id: "contact", label: "Contact", icon: "Mail" },
 ] as const;
 
 export type NavCategory = typeof NAV_CATEGORIES[number]["id"];
