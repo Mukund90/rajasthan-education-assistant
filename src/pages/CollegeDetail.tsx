@@ -196,26 +196,38 @@ export default function CollegeDetail() {
             <CardHeader>
               <CardTitle>Placement Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Average Package</p>
+                  <p className="font-semibold">{fmt(college.placements.average_package)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Highest Package</p>
+                  <p className="font-semibold">
+                    {college.placements.highest_package ? fmt(college.placements.highest_package) : "Not Available"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Placement Rate</p>
+                  <p className="font-semibold">
+                    {college.placements.placement_rate ? `${college.placements.placement_rate}%` : "Not Available"}
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                Avg Package: {fmt(college.placements.average_package)}
-              </p>
-
-              <p>
-                Highest Package:{" "}
-                {college.placements.highest_package
-                  ? fmt(college.placements.highest_package)
-                  : "Not Available"}
-              </p>
-
-              <p>
-                Placement Rate:{" "}
-                {college.placements.placement_rate
-                  ? `${college.placements.placement_rate}%`
-                  : "Not Available"}
-              </p>
-
+              {college.placements.top_recruiters && college.placements.top_recruiters.length > 0 && (
+                <div className="pt-3 border-t border-border">
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Top Recruiting Companies</p>
+                  <div className="flex flex-wrap gap-2">
+                    {college.placements.top_recruiters.map((company) => (
+                      <Badge key={company} variant="outline" className="text-sm">
+                        {company}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -257,7 +269,7 @@ export default function CollegeDetail() {
               <a
                 href={college.website}
                 target="_blank"
-                className="flex items-center gap-2 text-blue-500"
+                className="flex items-center gap-2 text-primary hover:underline"
               >
                 <Globe className="h-4 w-4" />
                 Visit Website

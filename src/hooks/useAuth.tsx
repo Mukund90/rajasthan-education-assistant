@@ -7,8 +7,9 @@ type AuthCtx = {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
+  displayName: string | null;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -19,6 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
   const checkAdmin = async (userId: string) => {
     const { data } = await supabase
@@ -30,6 +32,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(!!data);
   };
 
+  const fetchDisplayName = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", userId)
+      .maybeSingle();
+    setDisplayName(data?.display_name ?? null);
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
@@ -37,8 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         if (session?.user) {
           await checkAdmin(session.user.id);
+          await fetchDisplayName(session.user.id);
         } else {
           setIsAdmin(false);
+          setDisplayName(null);
         }
         setLoading(false);
       }
@@ -49,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         await checkAdmin(session.user.id);
+        await fetchDisplayName(session.user.id);
       }
       setLoading(false);
     });
@@ -61,18 +75,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUp = async (email: string, password: string, name?: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name || email },
+      },
+    });
     return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setDisplayName(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, displayName, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
