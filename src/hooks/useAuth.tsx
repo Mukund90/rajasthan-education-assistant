@@ -50,22 +50,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await checkAdmin(session.user.id);
-          await fetchDisplayName(session.user.id);
+          // Use setTimeout to avoid Supabase auth deadlock
+          setTimeout(async () => {
+            if (!mounted) return;
+            await checkAdmin(session.user.id);
+            await fetchDisplayName(session.user.id);
+            setLoading(false);
+          }, 0);
         } else {
           setIsAdmin(false);
           setDisplayName(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -73,9 +82,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetchDisplayName(session.user.id);
       }
       setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
