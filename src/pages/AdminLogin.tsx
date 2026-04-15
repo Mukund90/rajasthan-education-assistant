@@ -33,7 +33,7 @@ export default function AdminLogin() {
     }
 
     if (isSignUp) {
-      toast({ title: "Success", description: "Please check your email to verify your account." });
+      toast({ title: "Account Created!", description: "You are now signed in." });
     } else {
       navigate("/admin");
     }
