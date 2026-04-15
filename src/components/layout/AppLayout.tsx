@@ -16,7 +16,9 @@ import {
   LogOut,
   Target,
   Mail,
+  User,
 } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const ICONS: Record<string, React.ElementType> = {
   MessageSquare,
@@ -37,7 +39,11 @@ interface AppLayoutProps {
 export function AppLayout({ activeTab, onTabChange, children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, signOut, displayName } = useAuth();
+
+  const initials = displayName
+    ? displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() || "U";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -135,17 +141,36 @@ export function AppLayout({ activeTab, onTabChange, children }: AppLayoutProps) 
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0">
-        {/* Mobile header */}
-        <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
-          <button onClick={() => setSidebarOpen(true)} className="text-foreground">
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-primary" />
-            <span className="font-heading font-semibold text-sm text-foreground">
-              DTE Rajasthan Assistant
-            </span>
+        {/* Header with user info */}
+        <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="text-foreground lg:hidden">
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2 lg:hidden">
+              <Bot className="h-5 w-5 text-primary" />
+              <span className="font-heading font-semibold text-sm text-foreground">
+                DTE Rajasthan Assistant
+              </span>
+            </div>
           </div>
+
+          {/* User profile - top right */}
+          {user && (
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-foreground leading-tight">
+                  {displayName || user.email}
+                </p>
+                <p className="text-xs text-muted-foreground">Student</p>
+              </div>
+              <Avatar className="h-9 w-9 border-2 border-primary/20">
+                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          )}
         </header>
 
         {/* Content */}

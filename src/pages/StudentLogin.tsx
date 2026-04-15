@@ -8,6 +8,7 @@ import { Bot, LogIn, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StudentLogin() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -20,7 +21,7 @@ export default function StudentLogin() {
     setLoading(true);
 
     if (isSignUp) {
-      const { error } = await signUp(email, password);
+      const { error } = await signUp(email, password, name);
       setLoading(false);
       if (error) {
         toast({ title: "Error", description: error, variant: "destructive" });
@@ -45,16 +46,29 @@ export default function StudentLogin() {
             <Bot className="h-8 w-8 text-primary-foreground" />
           </div>
           <CardTitle className="font-heading text-2xl">
-            {isSignUp ? "Create Student Account" : "Student Login"}
+            {isSignUp ? "Create Account" : "Login"}
           </CardTitle>
           <CardDescription>
             {isSignUp
-              ? "Sign up to access DTE Rajasthan Student Assistant"
-              : "Sign in to explore colleges, scholarships & more"}
+              ? "Create your account to access DTE Rajasthan Student Assistant"
+              : "Login to explore colleges, scholarships & more"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -80,7 +94,7 @@ export default function StudentLogin() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {isSignUp ? <UserPlus className="h-4 w-4 mr-2" /> : <LogIn className="h-4 w-4 mr-2" />}
-              {loading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
+              {loading ? "Please wait..." : isSignUp ? "Create Account" : "Login"}
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-4">
@@ -89,7 +103,7 @@ export default function StudentLogin() {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-primary hover:underline font-medium"
             >
-              {isSignUp ? "Sign in" : "Sign up"}
+              {isSignUp ? "Login" : "Create Account"}
             </button>
           </p>
         </CardContent>
