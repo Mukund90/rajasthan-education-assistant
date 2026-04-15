@@ -82,7 +82,7 @@ export default function AdminLogin() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="h-4 w-4 mr-2" />
-              {loading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
+              {loading ? "Please wait..." : isSignUp ? "Create Account" : "Login"}
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-4">
@@ -91,7 +91,7 @@ export default function AdminLogin() {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-primary hover:underline font-medium"
             >
-              {isSignUp ? "Sign in" : "Sign up"}
+              {isSignUp ? "Login" : "Create Account"}
             </button>
           </p>
           <p className="text-center mt-4">
