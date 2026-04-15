@@ -23,41 +23,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [displayName, setDisplayName] = useState<string | null>(null);
 
   const checkAdmin = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      setIsAdmin(!!data);
+    } catch {
+      setIsAdmin(false);
+    }
   };
 
   const fetchDisplayName = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("user_id", userId)
-      .maybeSingle();
-    setDisplayName(data?.display_name ?? null);
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("user_id", userId)
+        .maybeSingle();
+      setDisplayName(data?.display_name ?? null);
+    } catch {
+      setDisplayName(null);
+    }
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await checkAdmin(session.user.id);
-          await fetchDisplayName(session.user.id);
+          // Use setTimeout to avoid Supabase auth deadlock
+          setTimeout(async () => {
+            if (!mounted) return;
+            await checkAdmin(session.user.id);
+            await fetchDisplayName(session.user.id);
+            setLoading(false);
+          }, 0);
         } else {
           setIsAdmin(false);
           setDisplayName(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -65,9 +82,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetchDisplayName(session.user.id);
       }
       setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
