@@ -269,7 +269,7 @@ export default function CollegeDetail() {
               <a
                 href={college.website}
                 target="_blank"
-                className="flex items-center gap-2 text-blue-500"
+                className="flex items-center gap-2 text-primary hover:underline"
               >
                 <Globe className="h-4 w-4" />
                 Visit Website
