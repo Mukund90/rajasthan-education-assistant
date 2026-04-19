@@ -1,7 +1,7 @@
 import { ChatMessage } from "@/lib/types";
 import { Bot, User, Volume2, VolumeX } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export function ChatBubble({ message, autoSpeak }: { message: ChatMessage; autoSpeak?: boolean }) {
