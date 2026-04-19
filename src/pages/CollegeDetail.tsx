@@ -19,6 +19,7 @@ import {
   BedDouble,
 } from "lucide-react";
 import collegeDefaultImg from "@/assets/college-default.jpg";
+import { CollegeCharts } from "@/components/colleges/CollegeCharts";
 
 export default function CollegeDetail() {
   const { id } = useParams();
@@ -189,6 +190,9 @@ export default function CollegeDetail() {
             </div>
           </CardContent>
         </Card>
+
+        {/* CHARTS & ANALYTICS */}
+        <CollegeCharts college={college} />
 
         {/* PLACEMENTS */}
         {college.placements && (

@@ -11,10 +11,11 @@ import {
 import { CollegeFormModal } from "@/components/admin/CollegeFormModal";
 import { ScholarshipFormModal } from "@/components/admin/ScholarshipFormModal";
 import { FaqAnalytics } from "@/components/admin/FaqAnalytics";
+import { StudentQueriesTab } from "@/components/admin/StudentQueriesTab";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
-type Tab = "overview" | "colleges" | "scholarships" | "analytics";
+type Tab = "overview" | "colleges" | "scholarships" | "analytics" | "queries";
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -80,6 +81,7 @@ export default function AdminDashboard() {
     { id: "colleges", label: "Colleges", icon: GraduationCap },
     { id: "scholarships", label: "Scholarships", icon: Award },
     { id: "analytics", label: "FAQ Analytics", icon: BarChart3 },
+    { id: "queries", label: "Student Queries", icon: MessageSquare },
   ];
 
   return (
@@ -233,6 +235,7 @@ export default function AdminDashboard() {
         )}
 
         {tab === "analytics" && <FaqAnalytics />}
+        {tab === "queries" && <StudentQueriesTab />}
       </main>
 
       {showCollegeForm && (
