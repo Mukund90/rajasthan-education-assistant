@@ -9,6 +9,10 @@ export function ChatBubble({ message, autoSpeak }: { message: ChatMessage; autoS
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const speak = useCallback(() => {
+    if (!("speechSynthesis" in window)) {
+      alert("Voice playback is not supported in this browser.");
+      return;
+    }
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
@@ -16,17 +20,40 @@ export function ChatBubble({ message, autoSpeak }: { message: ChatMessage; autoS
     }
     // Strip markdown for cleaner speech
     const plainText = message.content
-      .replace(/[#*_~`>\-\[\]()!]/g, "")
-      .replace(/\n+/g, ". ");
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/[#*_~`>\[\]()!]/g, "")
+      .replace(/\n+/g, ". ")
+      .trim();
+    if (!plainText) return;
+
+    const isHindi = /[\u0900-\u097F]/.test(plainText);
     const utterance = new SpeechSynthesisUtterance(plainText);
-    utterance.lang = /[\u0900-\u097F]/.test(plainText) ? "hi-IN" : "en-IN";
+    utterance.lang = isHindi ? "hi-IN" : "en-IN";
     utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    // Pick the best matching voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const preferred =
+      voices.find((v) => v.lang === utterance.lang) ||
+      voices.find((v) => v.lang.startsWith(isHindi ? "hi" : "en"));
+    if (preferred) utterance.voice = preferred;
+
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
     setIsSpeaking(true);
   }, [message.content, isSpeaking]);
+
+  // Ensure voices list is loaded (some browsers load asynchronously)
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const handler = () => window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = handler;
+    handler();
+  }, []);
 
   return (
     <div className={`flex gap-3 animate-fade-in-up py-3 ${isUser ? "justify-end" : ""}`}>
